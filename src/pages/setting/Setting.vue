@@ -4,7 +4,7 @@ import { useSettingStore } from "@/stores/setting.ts";
 import { getAudioFileUrl, usePlayAudio } from "@/hooks/sound.ts";
 import { getShortcutKey, useEventListener } from "@/hooks/event.ts";
 import { checkAndUpgradeSaveDict, checkAndUpgradeSaveSetting, cloneDeep, loadJsLib, shakeCommonDict } from "@/utils";
-import {DefaultShortcutKeyMap, ShortcutKey, WordPracticeMode} from "@/types/types.ts";
+import { DefaultShortcutKeyMap, ShortcutKey, WordPracticeMode } from "@/types/types.ts";
 import BaseButton from "@/components/BaseButton.vue";
 import VolumeIcon from "@/components/icon/VolumeIcon.vue";
 import { useBaseStore } from "@/stores/base.ts";
@@ -40,6 +40,7 @@ const tabIndex = $ref(0)
 const settingStore = useSettingStore()
 const runtimeStore = useRuntimeStore()
 const store = useBaseStore()
+
 //@ts-ignore
 const gitLastCommitHash = ref(LATEST_COMMIT_HASH);
 const simpleWords = $computed({
@@ -679,7 +680,23 @@ function importOldData() {
         </div>
 
         <div v-if="tabIndex === 5">
-          <div class="item p-2">
+          <div class="log-item">
+            <div class="mb-2">
+              <div>
+                <div>更新日期：2025/11/6</div>
+                <div>更新内容：新增随机复习功能</div>
+              </div>
+            </div>
+          </div>
+          <div class="log-item">
+            <div class="mb-2">
+              <div>
+                <div>更新日期：2025/10/30</div>
+                <div>更新内容：集成PWA基础配置，支持用户以类App形式打开项目</div>
+              </div>
+            </div>
+          </div>
+          <div class="log-item">
             <div class="mb-2">
               <div>
                 <div>更新日期：2025/10/26</div>
@@ -730,9 +747,16 @@ function importOldData() {
                 <div>通过引入「复习」与「默写」两种模式，使复习流程更加灵活、高效。</div>
               </div>
             </div>
-            <div class="line"></div>
           </div>
-          <div class="item p-2">
+          <div class="log-item">
+            <div class="mb-2">
+              <div>
+                <div>更新日期：2025/10/8</div>
+                <div>更新内容：文章支持自动播放下一篇</div>
+              </div>
+            </div>
+          </div>
+          <div class="log-item">
             <div class="mb-2">
               <div>
                 <div>更新日期：2025/9/14</div>
@@ -744,7 +768,6 @@ function importOldData() {
                 <div>3、单词可导入、导出</div>
               </div>
             </div>
-            <div class="line"></div>
           </div>
         </div>
 
@@ -774,6 +797,11 @@ function importOldData() {
 </template>
 
 <style scoped lang="scss">
+
+.log-item{
+  border-bottom: 1px solid var(--color-input-border);
+  margin-bottom: 1rem;
+}
 
 .setting {
   @apply text-lg;

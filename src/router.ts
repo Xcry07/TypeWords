@@ -1,7 +1,7 @@
 import * as VueRouter from 'vue-router'
-import {RouteRecordRaw} from 'vue-router'
+import { RouteRecordRaw } from 'vue-router'
 import WordsPage from "@/pages/word/WordsPage.vue";
-import PC from "@/pages/index.vue";
+import Layout from "@/pages/layout.vue";
 import ArticlesPage from "@/pages/article/ArticlesPage.vue";
 import PracticeArticles from "@/pages/article/PracticeArticles.vue";
 import DictDetail from "@/pages/word/DictDetail.vue";
@@ -10,17 +10,15 @@ import BookDetail from "@/pages/article/BookDetail.vue";
 import DictList from "@/pages/word/DictList.vue";
 import BookList from "@/pages/article/BookList.vue";
 import Setting from "@/pages/setting/Setting.vue";
-import Home from "@/pages/home/index.vue";
 import Login from "@/pages/user/login.vue";
 import User from "@/pages/user/index.vue";
 
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: PC,
-    redirect: '/',
+    component: Layout,
     children: [
-      {path: '/', component: Home},
+      {path: '/', redirect: '/words'},
       {path: 'words', component: WordsPage},
       {path: 'word', redirect: '/words'},
       {path: 'practice-words/:id', component: PracticeWords},

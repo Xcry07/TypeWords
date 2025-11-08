@@ -427,8 +427,8 @@ function onContextMenu(e: MouseEvent, sentence: Sentence, i, j, w) {
         label: "收藏单词",
         onClick: () => {
           let word = props.article.sections[i][j].words[w]
-          let doc = nlp(word.word)
           let text = word.word
+          let doc = nlp(text)
           // 优先判断是不是动词
           if (doc.verbs().found) {
             text = doc.verbs().toInfinitive().text()

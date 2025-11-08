@@ -71,6 +71,7 @@
   --color-progress-bar: #d1d5df !important;
 
   --color-label-bg: whitesmoke;
+  --color-link: rgb(64, 158, 255)
 }
 
 .footer {
@@ -213,8 +214,7 @@ html, body {
 }
 
 a {
-  $main: rgb(64, 158, 255);
-  color: $main;
+  color: var(--color-link);
   text-decoration: none;
 }
 

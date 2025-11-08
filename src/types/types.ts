@@ -200,6 +200,7 @@ export interface TaskWords {
   new: Word[],
   review: Word[],
   write: Word[],
+  shuffle: Word[],
 }
 
 export class DictId {

@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import {WordPracticeType, ShortcutKey, Word, WordPracticeMode} from "@/types/types.ts";
+import {ShortcutKey, Word, WordPracticeType} from "@/types/types.ts";
 import VolumeIcon from "@/components/icon/VolumeIcon.vue";
 import {useSettingStore} from "@/stores/setting.ts";
 import {usePlayBeep, usePlayCorrect, usePlayKeyboardAudio, usePlayWordAudio} from "@/hooks/sound.ts";
 import {emitter, EventKey, useEvents} from "@/utils/eventBus.ts";
-import {inject, onMounted, onUnmounted, Ref, watch} from "vue";
+import {onMounted, onUnmounted, watch} from "vue";
 import SentenceHightLightWord from "@/pages/word/components/SentenceHightLightWord.vue";
 import {usePracticeStore} from "@/stores/practice.ts";
 import {getDefaultWord} from "@/types/func.ts";
-import {_nextTick, last, sleep} from "@/utils";
+import {_nextTick, last} from "@/utils";
 import BaseButton from "@/components/BaseButton.vue";
 import Space from "@/pages/article/components/Space.vue";
 import Toast from "@/components/base/toast/Toast.ts";
-import Tooltip from "@/components/base/Tooltip.vue";
 
 interface IProps {
   word: Word,
@@ -104,9 +103,7 @@ function repeat() {
     wordRepeatCount++
     inputLock = false
 
-    if (settingStore.wordSound) {
-      volumeIconRef?.play()
-    }
+    if (settingStore.wordSound) volumeIconRef?.play()
   }, settingStore.waitTimeForChangeWord)
 }
 
@@ -144,6 +141,7 @@ function unknown(e) {
     if (!showWordResult) {
       showWordResult = true
       emit('wrong')
+      if (settingStore.wordSound) volumeIconRef?.play()
       return
     }
   }
@@ -153,21 +151,40 @@ function unknown(e) {
 async function onTyping(e: KeyboardEvent) {
   debugger
   let word = props.word.word
+  // 输入完成会锁死不能再输入
   if (inputLock) {
-    // 因为输入完成会锁死不能再输入，所以在这里判断空格键切换到下一个单词
-    if (e.code === 'Space' && input.toLowerCase() === word.toLowerCase()) {
-      showWordResult = inputLock = false
-      emit('complete')
-    } else {
-      //当显示单词时，提示用户正确按键
-      if (showWordResult) {
-        pressNumber++
-        if (pressNumber >= 3) {
-          Toast.info(right ? '请按空格键切换' : '请按删除键重新输入', {duration: 2000})
-          pressNumber = 0
+    //判断是否是空格键以便切换到下一个单词
+    if (e.code === 'Space') {
+      //正确时就切换到下一个单词
+      if (right) {
+        showWordResult = inputLock = false
+        emit('complete')
+      } else {
+        if (showWordResult) {
+          // 错误时，提示用户按删除键，仅默写需要提示
+          pressNumber++
+          if (pressNumber >= 3) {
+            Toast.info('请按删除键重新输入', {duration: 2000})
+            pressNumber = 0
+          }
         }
       }
+    } else {
+      //当正确时，提醒用户按空格键切下一个
+      if (right) {
+        pressNumber++
+        if (pressNumber >= 3) {
+          Toast.info('请按空格键继续', {duration: 2000})
+          pressNumber = 0
+        }
+      } else {
+        //当错误时，按任意键重新输入
+        showWordResult = inputLock = false
+        input = wrong = ''
+        onTyping(e)
+      }
     }
+
     return
   }
   inputLock = true
@@ -186,12 +203,12 @@ async function onTyping(e: KeyboardEvent) {
           } else {
             //未显示单词，则播放正确音乐，并在后面设置为 showWordResult 为 true 来显示单词
             playCorrect()
-            volumeIconRef?.play()
+            if (settingStore.wordSound) volumeIconRef?.play()
           }
         } else {
           //错误处理
           playBeep()
-          volumeIconRef?.play()
+          if (settingStore.wordSound) volumeIconRef?.play()
           emit('wrong')
         }
         showWordResult = true
@@ -209,7 +226,7 @@ async function onTyping(e: KeyboardEvent) {
     if (settingStore.ignoreCase) {
       right = letter.toLowerCase() === word[input.length].toLowerCase()
     } else {
-      right = letter === props.word.word[input.length]
+      right = letter === word[input.length]
     }
     if (right) {
       input += letter
@@ -219,10 +236,11 @@ async function onTyping(e: KeyboardEvent) {
       emit('wrong')
       wrong = letter
       playBeep()
-      volumeIconRef?.play()
-      await sleep(500)
-      if (settingStore.inputWrongClear) input = ''
-      wrong = ''
+      if (settingStore.wordSound) volumeIconRef?.play()
+      setTimeout(() => {
+        if (settingStore.inputWrongClear) input = ''
+        wrong = ''
+      }, 500)
     }
     // 更新当前单词信息
     updateCurrentWordInfo();

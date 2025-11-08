@@ -3,12 +3,12 @@
 import { inject, Ref, watch } from "vue"
 import { usePracticeStore } from "@/stores/practice.ts";
 import { useSettingStore } from "@/stores/setting.ts";
-import { PracticeData, WordPracticeType, ShortcutKey } from "@/types/types.ts";
+import {PracticeData, WordPracticeType, ShortcutKey, TaskWords} from "@/types/types.ts";
 import BaseIcon from "@/components/BaseIcon.vue";
 import Tooltip from "@/components/base/Tooltip.vue";
 import Progress from '@/components/base/Progress.vue'
 
-const statisticsStore = usePracticeStore()
+const statStore = usePracticeStore()
 const settingStore = useSettingStore()
 
 defineProps<{
@@ -34,7 +34,7 @@ function format(val: number, suffix: string = '', check: number = -1) {
 const status = $computed(() => {
   if (isTypingWrongWord.value) return '复习错词'
   let str = ''
-  switch (statisticsStore.step) {
+  switch (statStore.step) {
     case 0:
       str += `学习新词`
       break
@@ -61,6 +61,9 @@ const status = $computed(() => {
       break
     case 8:
       str += '默写之前学习'
+      break
+    case 10:
+      str += '随机复习'
       break
   }
   return str
@@ -96,22 +99,22 @@ const progress = $computed(() => {
             <div class="name">{{ status }}</div>
           </div>
           <div class="row">
-            <div class="num">{{ statisticsStore.total }}</div>
+            <div class="num">{{ statStore.total }}</div>
             <div class="line"></div>
             <div class="name">单词总数</div>
           </div>
           <div class="row">
-            <div class="num">{{ format(statisticsStore.inputWordNumber, '', 0) }}</div>
+            <div class="num">{{ format(statStore.inputWordNumber, '', 0) }}</div>
             <div class="line"></div>
             <div class="name">总输入数</div>
           </div>
           <div class="row">
-            <div class="num">{{ format(statisticsStore.wrong, '', 0) }}</div>
+            <div class="num">{{ format(statStore.wrong, '', 0) }}</div>
             <div class="line"></div>
             <div class="name">总错误数</div>
           </div>
         </div>
-        <div class="flex  gap-2  justify-center items-center">
+        <div class="flex gap-2 justify-center items-center">
           <BaseIcon
               :class="!isSimple?'collect':'fill'"
               @click="$emit('toggleSimple')"
