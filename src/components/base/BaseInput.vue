@@ -198,6 +198,7 @@ const vFocus = {
     height: 1.5rem;
     color: var(--color-input-color);
     background: transparent;
+    width: 100%;
   }
 }
 </style>

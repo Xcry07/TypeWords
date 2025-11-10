@@ -12,7 +12,8 @@ import BookList from "@/pages/article/BookList.vue";
 import Setting from "@/pages/setting/Setting.vue";
 import Login from "@/pages/user/login.vue";
 import User from "@/pages/user/index.vue";
-import WechatCallback from "@/pages/user/wechat-callback.vue";
+import UserAgreement from "@/pages/user/UserAgreement.vue";
+import PrivacyPolicy from "@/pages/user/PrivacyPolicy.vue";
 import { useAuthStore } from "@/stores/auth.ts";
 
 export const routes: RouteRecordRaw[] = [
@@ -37,6 +38,8 @@ export const routes: RouteRecordRaw[] = [
       {path: 'setting', component: Setting},
       {path: 'login', component: Login},
       {path: 'user', component: User},
+      {path: 'user-agreement', component: UserAgreement},
+      {path: 'privacy-policy', component: PrivacyPolicy},
     ]
   },
   {path: '/batch-edit-article', component: () => import("@/pages/article/BatchEditArticlePage.vue")},
@@ -63,7 +66,7 @@ router.beforeEach(async (to: any, from: any) => {
   const authStore = useAuthStore()
   
   // 公共路由，不需要登录验证
-  const publicRoutes = ['/login', '/wechat/callback']
+  const publicRoutes = ['/login', '/wechat/callback', '/user-agreement', '/privacy-policy']
   
   // 如果目标路由是公共路由，直接放行
   if (publicRoutes.includes(to.path)) {

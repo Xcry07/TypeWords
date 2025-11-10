@@ -56,6 +56,7 @@ declare module 'vue' {
     IconFluentChevronLeft28Filled: typeof import('~icons/fluent/chevron-left28-filled')['default']
     IconFluentDatabasePerson20Regular: typeof import('~icons/fluent/database-person20-regular')['default']
     IconFluentDelete20Regular: typeof import('~icons/fluent/delete20-regular')['default']
+    IconFluentDismiss12Regular: typeof import('~icons/fluent/dismiss12-regular')['default']
     IconFluentDismiss20Regular: typeof import('~icons/fluent/dismiss20-regular')['default']
     IconFluentDismissCircle16Regular: typeof import('~icons/fluent/dismiss-circle16-regular')['default']
     IconFluentDismissCircle20Filled: typeof import('~icons/fluent/dismiss-circle20-filled')['default']
