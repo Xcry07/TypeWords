@@ -7,13 +7,11 @@ import BaseInput from "@/components/base/BaseInput.vue";
 interface IProps {
   list: Article[];
   showTranslate?: boolean;
-  activeId: string | number;
 }
 
 const props = withDefaults(defineProps<IProps>(), {
   list: () => [] as Article[],
   showTranslate: true,
-  activeId: ""
 })
 
 const emit = defineEmits<{
@@ -79,7 +77,10 @@ defineExpose({ scrollToBottom, scrollToItem })
         </template>
       </BaseInput>
     </div>
-    <BaseList ref="listRef" @click="(e: any) => emit('click', e)" :list="localList" v-bind="$attrs">
+    <BaseList ref="listRef"
+              @click="(e: any) => emit('click', e)"
+              :list="localList"
+              v-bind="$attrs">
       <template v-slot:prefix="{ item, index }">
         <slot name="prefix" :item="item" :index="index"></slot>
       </template>

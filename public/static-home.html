@@ -324,66 +324,6 @@
         toggleEl('#qqDialog', true)
       }
     </script>
-
-    <script>
-      function migrateFromOldDomain() {
-        return new Promise((resolve) => {
-          const iframe = document.createElement('iframe');
-          iframe.style.display = 'none';
-          iframe.src = 'https://2study.top/migrate.html';
-          document.body.appendChild(iframe);
-
-          // 接收数据
-          window.addEventListener('message', async function handler(e) {
-            if (e.data && e.data.type === 'responseData') {
-              // 写入 localStorage
-              const localData = e.data.localStorageData;
-              for (const key in localData) {
-                if (localData[key] !== null) localStorage.setItem(key, localData[key]);
-              }
-
-              // 写入 IndexedDB
-              const indexedData = e.data.indexedDBData;
-              const request = indexedDB.open('type-words', 1);
-              request.onupgradeneeded = function (event) {
-                const db = event.target.result;
-                // 建 store
-                ['typing-word-dict', 'typing-word-setting', 'typing-word-files'].forEach(name => {
-                  if (!db.objectStoreNames.contains(name)) {
-                    db.createObjectStore(name, {autoIncrement: true});
-                  }
-                });
-              };
-              request.onsuccess = function (event) {
-                const db = event.target.result;
-                const tx = db.transaction(['typing-word-dict', 'typing-word-setting', 'typing-word-files'], 'readwrite');
-                for (const storeName in indexedData) {
-                  const store = tx.objectStore(storeName);
-                  const items = indexedData[storeName];
-                  if (items) {
-                    items.forEach(item => store.put(item));
-                  }
-                }
-                tx.oncomplete = function () {
-                  resolve(true);
-                  window.removeEventListener('message', handler);
-                  iframe.remove();
-                };
-              };
-
-              // 发送请求
-              iframe.contentWindow.postMessage({type: 'requestData'}, 'https://2study.top');
-            }
-          });
-        });
-      }
-
-      if (location.href === 'https://typewords.cc/') {
-        migrateFromOldDomain().then(() => {
-          console.log('数据迁移完成！');
-        });
-      }
-    </script>
 </head>
 <body>
 <div class="wrapper">
