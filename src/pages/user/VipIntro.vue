@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import BasePage from '@/components/BasePage.vue'
 import BaseButton from '@/components/BaseButton.vue'
-import {useRouter} from 'vue-router'
-import {useUserStore} from '@/stores/auth.ts'
-import {User} from "@/apis/user.ts";
-import {computed, onMounted, onUnmounted, ref, watch} from "vue";
+import { useRouter } from 'vue-router'
+import { useUserStore } from '@/stores/auth.ts'
+import { User } from "@/apis/user.ts";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import Header from "@/components/Header.vue";
-import {LevelBenefits, levelBenefits, orderCreate, orderStatus} from "@/apis/member.ts";
+import { couponInfo, LevelBenefits, levelBenefits, orderCreate, orderStatus } from "@/apis/member.ts";
 import Radio from "@/components/base/radio/Radio.vue";
 import RadioGroup from "@/components/base/radio/RadioGroup.vue";
-import {APP_NAME} from "@/config/env.ts";
+import { APP_NAME } from "@/config/env.ts";
 import Toast from "@/components/base/toast/Toast.ts";
-import {_dateFormat, _nextTick} from "@/utils";
+import { _dateFormat, _nextTick } from "@/utils";
 import InputNumber from "@/components/base/InputNumber.vue";
 import dayjs from "dayjs";
+import BaseInput from "@/components/base/BaseInput.vue";
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -94,7 +95,7 @@ const totalPrice = $computed(() => (Number(duration) * Number(selectPlan?.price)
 const startDate = $computed(() => {
   if (member?.active) {
     return member.endDate
-  }else {
+  } else {
     return _dateFormat(Date.now())
   }
 })
@@ -134,6 +135,9 @@ function goPurchase(plan: Plan) {
 let startLoop = $ref(false)
 let orderNo = $ref('')
 let timer: number = $ref()
+let showCouponInput = $ref(false)
+let couponCode = $ref('')
+let discount = $ref(1)
 
 watch(() => startLoop, (n) => {
   if (n) {
@@ -146,8 +150,10 @@ watch(() => startLoop, (n) => {
             userStore.init()
             startLoop = false
             selectedPlanId = undefined
-            clearInterval(timer)
           }
+        } else {
+          startLoop = false
+          Toast.error(res.msg || '付款失败')
         }
       })
     }, 1000)
@@ -179,22 +185,33 @@ async function handlePayment() {
   loading = false
 }
 
+async function handleCoupon() {
+  if (showCouponInput) {
+    let res = await couponInfo({couponCode})
+    if (res.success) {
+      discount = res.data.discount
+    } else {
+      Toast.error(res.msg || '优惠券无效')
+    }
+  } else {
+    showCouponInput = true
+  }
+}
+
 </script>
 
 <template>
   <BasePage>
     <div class="space-y-6">
-      <div>
+      <div class="card bg-reverse-white">
         <Header title="会员介绍"></Header>
-        <div class="center">
-          <div>
-            <div class="text-lg flex items-center" v-for="f in data.benefits" :key="f.name">
-              <IconFluentCheckmarkCircle20Regular class="mr-2 text-green-600"/>
-              <span>
+        <div class="grid grid-cols-3 grid-rows-3 gap-3">
+          <div class="text-lg  items-center" v-for="f in data.benefits" :key="f.name">
+            <IconFluentCheckmarkCircle20Regular class="mr-2 text-green-600"/>
+            <span>
                <span>{{ f.name }}</span>
                 <span v-if="f.value !== 'true'">{{ `(${f.value}${f.unit ?? ''})` }}</span>
               </span>
-            </div>
           </div>
         </div>
       </div>
@@ -217,9 +234,9 @@ async function handlePayment() {
                 <span>自动续费已开启</span>
               </div>
               <BaseButton
-                size="small"
-                type="info"
-                @click="toggleAutoRenew">
+                  size="small"
+                  type="info"
+                  @click="toggleAutoRenew">
                 关闭
               </BaseButton>
             </div>
@@ -249,11 +266,11 @@ async function handlePayment() {
               开启自动续费，可随时关闭
             </div>
             <BaseButton
-              class="w-full mt-4"
-              size="large"
-              :type="(p.id === currentPlan?.id || p.id === selectedPlanId) ? 'primary' : 'info'"
-              :disabled="p.id === currentPlan?.id"
-              @click="goPurchase(p)">
+                class="w-full mt-4"
+                size="large"
+                :type="(p.id === currentPlan?.id || p.id === selectedPlanId) ? 'primary' : 'info'"
+                :disabled="p.id === currentPlan?.id"
+                @click="goPurchase(p)">
               {{ getPlanButtonText(p) }}
             </BaseButton>
           </div>
@@ -269,6 +286,18 @@ async function handlePayment() {
         <p class="">选择支付方式完成订单</p>
       </div>
 
+
+      <div class="center">
+        <div class="card bg-reverse-white gap-6 flex justify-between items-center w-7/10">
+          <div class="center gap-2" v-if="!showCouponInput">
+            <IconStreamlineDiscountPercentCoupon/>
+            <span>有抵用券？</span>
+          </div>
+          <BaseInput v-else v-model="couponCode" placeholder="请输入优惠券" autofocus/>
+          <BaseButton size="large" @click="handleCoupon">{{ showCouponInput ? '确定' : '在此兑换!' }}</BaseButton>
+        </div>
+      </div>
+
       <!-- Main Content -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Left Card: Payment Method Selection -->
@@ -277,11 +306,11 @@ async function handlePayment() {
           <RadioGroup v-model="selectedPaymentMethod">
             <div class="space-y-3 w-full">
               <div
-                v-for="method in paymentMethods"
-                :key="method.id"
-                @click=" selectedPaymentMethod = method.id"
-                class="flex p-4 border rounded-lg cp transition-all duration-200"
-                :class="[
+                  v-for="method in paymentMethods"
+                  :key="method.id"
+                  @click=" selectedPaymentMethod = method.id"
+                  class="flex p-4 border rounded-lg cp transition-all duration-200"
+                  :class="[
                   selectedPaymentMethod === method.id
                     ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
@@ -339,12 +368,12 @@ async function handlePayment() {
 
           <!-- Payment Button -->
           <BaseButton
-            class="w-full"
-            size="large"
-            :loading="loading || startLoop"
-            :type="!!selectedPaymentMethod ? 'primary' : 'info'"
-            :disabled="!selectedPaymentMethod"
-            @click="handlePayment"
+              class="w-full"
+              size="large"
+              :loading="loading || startLoop"
+              :type="!!selectedPaymentMethod ? 'primary' : 'info'"
+              :disabled="!selectedPaymentMethod"
+              @click="handlePayment"
           >
             付款
           </BaseButton>

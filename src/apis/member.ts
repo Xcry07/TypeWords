@@ -36,3 +36,7 @@ export function orderCreate(params) {
 export function orderStatus(params) {
   return http('/member/orderStatus', null, params, 'get')
 }
+
+export function couponInfo(params) {
+  return http('/member/couponInfo', null, params, 'get')
+}

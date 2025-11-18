@@ -49,6 +49,7 @@
     "@iconify-json/qlementine-icons": "^1.2.11",
     "@iconify-json/ri": "^1.2.5",
     "@iconify-json/simple-icons": "^1.2.48",
+    "@iconify-json/streamline": "^1.2.5",
     "@iconify-json/system-uicons": "^1.2.4",
     "@types/file-saver": "^2.0.7",
     "@types/lodash-es": "^4.17.12",
