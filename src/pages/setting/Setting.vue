@@ -689,6 +689,14 @@ function importOldData() {
           <div class="log-item">
             <div class="mb-2">
               <div>
+                <div>日期：2025/11/22</div>
+                <div>内容：适配移动端</div>
+              </div>
+            </div>
+          </div>
+          <div class="log-item">
+            <div class="mb-2">
+              <div>
                 <div>日期：2025/11/16</div>
                 <div>内容：辨认单词时，不认识单词可以直接输入，自动标识为错误单词，无需按2</div>
               </div>
