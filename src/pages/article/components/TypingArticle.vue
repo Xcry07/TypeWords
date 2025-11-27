@@ -399,8 +399,6 @@ function onTyping(e: KeyboardEvent) {
       //单词输入完毕
       if (!currentWord.word[stringIndex]) {
         input = ''
-        //如果不是符号，播放完成音效
-        // if (currentWord.type === PracticeArticleWordType.Word) playCorrect()
         if (currentWord.nextSpace) {
           isSpace = true
         } else {
